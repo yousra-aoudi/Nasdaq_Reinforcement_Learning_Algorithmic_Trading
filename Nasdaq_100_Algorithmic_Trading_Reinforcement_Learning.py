@@ -260,7 +260,7 @@ l = len(data) - 1
 batch_size = 10
 states_sell = []
 states_buy = []
-episode_count = 3
+episode_count = 10
 
 
 for e in range(episode_count + 1):
@@ -308,12 +308,15 @@ for e in range(episode_count + 1):
         if len(agent.memory) > batch_size:
             agent.expReplay(batch_size)
 
-    if e % 10 == 0:
+    if e % 2 == 0:
         agent.model.save("models/model_ep" + str(e))
+
+
+# Deep Q-Learning Model
+print(agent.model.summary())
 
 # 6. Testing the data
 # agent is already defined in the training set above.
-#agent is already defined in the training set above.
 test_data = X_test
 l_test = len(test_data) - 1
 state = getState(test_data, 0, window_size + 1)
@@ -323,18 +326,18 @@ done = False
 states_sell_test = []
 states_buy_test = []
 # Get the trained model
-#model_name = "model_ep"+str(episode_count)
-model_name = "saved_model.pb"
+# model_name = "model_ep"+str(episode_count)
+model_name = "models/model_ep0/variables"
 agent = Agent(window_size, is_eval, model_name)
 state = getState(data, 0, window_size + 1)
 total_profit = 0
 agent.inventory = []
 
-for t in range ( l_test ):
-    action = agent.act ( state )
+for t in range(l_test):
+    action = agent.act(state)
     # print(action)
     # set_trace()
-    next_state = getState(test_data, t + 1, window_size + 1 )
+    next_state = getState(test_data, t + 1, window_size + 1)
     reward = 0
 
     if action == 1:
@@ -357,7 +360,7 @@ for t in range ( l_test ):
 
     if done:
         print("------------------------------------------")
-        print("Total Profit: " + formatPrice ( total_profit))
+        print("Total Profit: " + formatPrice(total_profit))
         print("------------------------------------------")
 
 plot_behavior(test_data, states_buy_test, states_sell_test, total_profit)
